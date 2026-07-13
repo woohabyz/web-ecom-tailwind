@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - TokoKu Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+
+    <div class="min-h-screen flex">
+        <!-- Branding -->
+        <div class="hidden lg:flex w-1/2 bg-gradient-to-br from-blue-600 to-indigo-800 items-center justify-center p-12">
+            <div class="text-white text-center">
+                <i class="fas fa-store text-6xl mb-4"></i>
+                <h1 class="text-4xl font-bold mb-2">TokoKu Admin</h1>
+                <p class="text-blue-100">Kelola toko online Anda dengan mudah dan cepat.</p>
+            </div>
+        </div>
+
+        <!-- Form Login -->
+        <div class="w-full lg:w-1/2 flex items-center justify-center p-8">
+            <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Selamat Datang!</h2>
+                <p class="text-gray-500 mb-6">Silakan login untuk melanjutkan.</p>
+
+                <!-- Form Login -->
+                <form id="loginForm">
+                    <!-- Input Email atau Username -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Email atau Username</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input type="text" id="usernameInput" placeholder="admin atau admin@tokoku.com" 
+                                   class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- Input Password -->
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                            <input type="password" id="passwordInput" placeholder="••••••••" 
+                                   class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- Tombol Login -->
+                    <button type="submit" 
+                            class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200">
+                        Login
+                    </button>
+                </form>
+
+                <!-- Link Daftar & Pesan Error -->
+                <div class="text-center mt-6">
+                    <p class="text-gray-600 text-sm">Belum punya akun? 
+                        <a href="#" id="daftarLink" class="text-blue-600 font-semibold hover:underline">Daftar di sini</a>
+                    </p>
+                    <p id="errorMessage" class="text-red-500 text-sm mt-3 hidden"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL REGISTER ==================== -->
+    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Daftar Akun Baru</h3>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="registerForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Username</label>
+                    <input type="text" id="regUsername" placeholder="contoh: johndoe" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                    <input type="email" id="regEmail" placeholder="contoh: john@email.com" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Role Akun</label>
+                    <select id="regRole" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="anggota">Anggota (Customer)</option>
+                        <option value="admin">Admin (Perlu Verifikasi)</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">*Pilih Admin untuk mengajukan akses ke dashboard admin</p>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                    <input type="password" id="regPassword" placeholder="Minimal 6 karakter" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit" 
+                        class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition duration-200">
+                    Daftar Sekarang
+                </button>
+            </form>
+            
+            <p id="registerError" class="text-red-500 text-sm mt-3 hidden text-center"></p>
+            <p id="registerSuccess" class="text-green-500 text-sm mt-3 hidden text-center"></p>
+        </div>
+    </div>
+
+   
+       <script>
+        // Load data user dari localStorage
+        let validUsers = JSON.parse(localStorage.getItem('validUsers')) || [
+            { username: 'admin', email: 'admin@tokoku.com', password: 'admin123', role: 'admin', isVerified: true }, // ← SUDAH VERIFIED!
+            { username: 'kasir1', email: 'kasir1@tokoku.com', password: 'kasir123', role: 'anggota', isVerified: true },
+            { username: 'manager', email: 'manager@tokoku.com', password: 'manager123', role: 'anggota', isVerified: true }
+        ];
+
+        function saveUsersToStorage() {
+            localStorage.setItem('validUsers', JSON.stringify(validUsers));
+        }
+
+        const form = document.getElementById('loginForm');
+        const daftarLink = document.getElementById('daftarLink');
+        const errorMessage = document.getElementById('errorMessage');
+        const registerModal = document.getElementById('registerModal');
+        const closeModal = document.getElementById('closeModal');
+        const registerForm = document.getElementById('registerForm');
+        const registerError = document.getElementById('registerError');
+        const registerSuccess = document.getElementById('registerSuccess');
+
+       function validateLogin(inputUser, inputPass) {
+            const foundUser = validUsers.find(u => u.username === inputUser || u.email === inputUser);
+            
+            if (!foundUser) {
+                return { status: 'not_registered' };
+            }
+            
+            if (foundUser.password !== inputPass) {
+                return { status: 'wrong_password' };
+            }
+            
+            // Cek status verifikasi untuk admin
+            if (foundUser.role === 'admin' && !foundUser.isVerified) {
+                return { status: 'pending_verification' };
+            }
+            
+            return { 
+                status: 'success', 
+                username: foundUser.username,
+                email: foundUser.email,
+                role: foundUser.role // ← Return role
+            };
+        }
+
+        function validateLogin(inputUser, inputPass) {
+            const foundUser = validUsers.find(u => u.username === inputUser || u.email === inputUser);
+            
+            if (!foundUser) {
+                return { status: 'not_registered' };
+            }
+            
+            if (foundUser.password !== inputPass) {
+                return { status: 'wrong_password' };
+            }
+            
+            // Cek status verifikasi untuk admin
+            if (foundUser.role === 'admin' && !foundUser.isVerified) {
+                return { status: 'pending_verification' };
+            }
+            
+            return { 
+                status: 'success', 
+                username: foundUser.username,
+                email: foundUser.email,
+                role: foundUser.role
+            };
+        }
+
+        // Update form submit
+        form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const usernameInput = document.getElementById('usernameInput').value.trim();
+        const passwordInput = document.getElementById('passwordInput').value;
+
+        if (usernameInput === '' || passwordInput === '') {
+            showError('Email/Username dan password tidak boleh kosong!');
+            return;
+        }
+
+        const result = validateLogin(usernameInput, passwordInput);
+
+        if (result.status === 'success') {
+            hideError();
+            sessionStorage.setItem('isLoggedIn', 'true');
+            sessionStorage.setItem('currentUser', result.username);
+            sessionStorage.setItem('currentUserEmail', result.email);
+            sessionStorage.setItem('currentUserRole', result.role);
+
+            console.log('Role user:', result.role);
+    
+    // Redirect berdasarkan role
+        if (result.role === 'admin') {
+                console.log('Redirect ke admin dashboard'); // ← DEBUG
+                window.location.href = 'dashboard.html'; // ← HARUSNYA INI!
+            } else {
+                console.log('Redirect ke member dashboard'); // ← DEBUG
+                window.location.href = 'member-dashboard.html';
+         }
+
+            // Redirect berdasarkan role
+            if (result.role === 'admin') {
+                window.location.href = 'dashboard.html';
+            } else {
+                window.location.href = 'member-dashboard.html';
+            }
+        } 
+        else if (result.status === 'pending_verification') {
+            showError('⏳ Akun admin Anda masih menunggu verifikasi. Silakan hubungi administrator.');
+        }
+        else if (result.status === 'not_registered') {
+            showError('Akun tidak terdaftar! Silakan <a href="#" id="goToRegister" class="underline font-bold">daftar di sini</a> terlebih dahulu.');
+            
+            setTimeout(function() {
+                const goToRegister = document.getElementById('goToRegister');
+                if (goToRegister) {
+                    goToRegister.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        openRegisterModal();
+                    });
+                }
+            }, 100);
+        } 
+        else if (result.status === 'wrong_password') {
+            showError('Password salah! Silakan coba lagi.');
+        }
+    });
+
+        function showError(message) {
+            errorMessage.innerHTML = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorMessage.classList.add('hidden');
+            errorMessage.innerHTML = '';
+        }
+
+        function openRegisterModal() {
+            registerModal.classList.remove('hidden');
+            registerModal.classList.add('flex');
+            registerError.classList.add('hidden');
+            registerSuccess.classList.add('hidden');
+            registerForm.reset();
+        }
+
+        closeModal.addEventListener('click', function() {
+            registerModal.classList.add('hidden');
+            registerModal.classList.remove('flex');
+        });
+
+        registerModal.addEventListener('click', function(e) {
+            if (e.target === registerModal) {
+                registerModal.classList.add('hidden');
+                registerModal.classList.remove('flex');
+            }
+        });
+
+        daftarLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            openRegisterModal();
+        });
+
+      registerForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const newUsername = document.getElementById('regUsername').value.trim();
+            const newEmail = document.getElementById('regEmail').value.trim();
+            const newPassword = document.getElementById('regPassword').value;
+            const newRole = document.getElementById('regRole').value; // ← Ambil role dari dropdown
+
+            if (newPassword.length < 6) {
+                registerError.textContent = 'Password minimal 6 karakter!';
+                registerError.classList.remove('hidden');
+                return;
+            }
+
+            const existingUser = validUsers.find(u => u.username === newUsername || u.email === newEmail);
+            if (existingUser) {
+                registerError.textContent = 'Username atau email sudah terdaftar!';
+                registerError.classList.remove('hidden');
+                return;
+            }
+
+            // Tambahkan user baru dengan role dan status verifikasi
+            validUsers.push({
+                username: newUsername,
+                email: newEmail,
+                password: newPassword,
+                role: newRole,
+                isVerified: newRole === 'anggota' ? true : false // Anggota langsung verified, Admin pending
+            });
+
+            saveUsersToStorage();
+
+            registerError.classList.add('hidden');
+            
+            // Pesan berbeda berdasarkan role
+            if (newRole === 'admin') {
+                registerSuccess.innerHTML = `
+                     Pendaftaran berhasil!<br>
+                     Akun admin Anda menunggu verifikasi.<br>
+                    <span class="text-sm text-gray-600">Hubungi administrator untuk verifikasi.</span>
+                `;
+            } else {
+                registerSuccess.textContent = 'Pendaftaran berhasil! Silakan login dengan akun baru Anda.';
+            }
+            registerSuccess.classList.remove('hidden');
+
+            setTimeout(function() {
+                registerModal.classList.add('hidden');
+                registerModal.classList.remove('flex');
+                registerForm.reset();
+                registerSuccess.classList.add('hidden');
+            }, 3000);
+        });
+
+        window.addEventListener('DOMContentLoaded', function() {
+            if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
+</div>
+</body>
+</html>

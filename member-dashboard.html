@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Anggota - TokoKu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+
+        /* ========== EFEK HOVER KATEGORI FAVORIT ========== */
+
+    /* Base transition untuk card kategori */
+    .grid.grid-cols-3 > div {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Efek hover: card naik + shadow */
+    .grid.grid-cols-3 > div:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.1), 0 8px 8px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Efek ikon: membesar & rotate sedikit */
+    .grid.grid-cols-3 > div:hover .bg-blue-100,
+    .grid.grid-cols-3 > div:hover .bg-green-100,
+    .grid.grid-cols-3 > div:hover .bg-purple-100,
+    .grid.grid-cols-3 > div:hover .bg-yellow-100,
+    .grid.grid-cols-3 > div:hover .bg-red-100,
+    .grid.grid-cols-3 > div:hover .bg-pink-100 {
+        transform: scale(1.15) rotate(-5deg);
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Background ikon jadi lebih cerah saat hover */
+    .grid.grid-cols-3 > div:hover .bg-blue-100 { background-color: rgb(191, 219, 254); }
+    .grid.grid-cols-3 > div:hover .bg-green-100 { background-color: rgb(187, 247, 208); }
+    .grid.grid-cols-3 > div:hover .bg-purple-100 { background-color: rgb(233, 213, 255); }
+    .grid.grid-cols-3 > div:hover .bg-yellow-100 { background-color: rgb(254, 240, 138); }
+    .grid.grid-cols-3 > div:hover .bg-red-100 { background-color: rgb(254, 202, 202); }
+    .grid.grid-cols-3 > div:hover .bg-pink-100 { background-color: rgb(252, 204, 231); }
+
+
+    /* Efek saat card dipencet (active) */
+    .grid.grid-cols-3 > div:active {
+        transform: translateY(-2px) scale(0.97);
+        box-shadow: 
+            0 0 0 3px rgba(200, 200, 200, 0.8),
+            0 0 20px rgba(59, 130, 246, 0.5),
+            0 0 40px rgba(59, 130, 246, 0.3),
+            0 8px 12px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Efek ripple saat dipencet */
+    .grid.grid-cols-3 > div::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(59, 130, 246, 0.3) 50%, transparent 70%);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .grid.grid-cols-3 > div:active::after {
+        width: 200px;
+        height: 200px;
+        opacity: 1;
+        transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+    }
+        /* Target semua product card yang ada */
+        .grid.grid-cols-2 > div {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .grid.grid-cols-2 > div:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .grid.grid-cols-2 > div img {
+            transition: transform 0.5s ease;
+        }
+        
+        .grid.grid-cols-2 > div:hover img {
+            transform: scale(1.1);
+        }
+        
+        .grid.grid-cols-2 > div button {
+            transition: all 0.3s ease;
+        }
+        
+        .grid.grid-cols-2 > div:hover button {
+            background-color: rgb(37, 99, 235);
+            transform: scale(1.02);
+        }
+
+            /* Efek glow putih saat card di-klik/active */
+        .grid.grid-cols-2 > div:active {
+            transform: translateY(-2px) scale(0.98);
+            box-shadow: 
+                0 0 0 2px rgba(200, 200, 200, 0.5),  /* Border abu-abu tipis */
+                0 5px 10px -3px rgba(0, 0, 0, 0.1);  /* Shadow normal */
+        }
+        
+        /* Pastikan card punya position relative untuk efek ripple */
+        .grid.grid-cols-2 > div {
+            position: relative;
+            overflow: hidden;
+        }
+    
+    
+        /* Efek pada button saat ditekan */
+        .grid.grid-cols-2 > div button:active {
+        transform: scale(0.95);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+    
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-blue-600">TokoKu</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-500 hover:text-blue-600 relative">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                    </button>
+                    <button class="text-gray-500 hover:text-blue-600 relative">
+                        <i class="fas fa-bell text-xl"></i>
+                    </button>
+                    <div class="relative">
+                        <button id="profileBtn" class="flex items-center space-x-2">
+                            <img id="memberAvatar" src="" class="w-10 h-10 rounded-full border-2 border-blue-500" alt="Profile">
+                            <span id="memberName" class="text-gray-700 font-medium hidden sm:block">Member</span>
+                        </button>
+                        <!-- Dropdown -->
+                        <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-user mr-2"></i> Profil Saya
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-cog mr-2"></i> Pengaturan
+                            </a>
+                            <a href="#" id="logoutBtn" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        <!-- Welcome & Wallet Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <!-- Welcome Card -->
+            <div class="lg:col-span-2 bg-gradient-to-r from-blue-600 to-indigo-800 rounded-2xl p-6 text-white shadow-lg">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-2">Selamat Datang, <span id="welcomeName">Member</span>! 👋</h2>
+                        <p class="text-blue-100 mb-4">Mulai belanja dan nikmati promo menarik!</p>
+                        <div class="flex space-x-3">
+                            <button class="bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition">
+                                <i class="fas fa-shopping-bag mr-2"></i>Belanja Sekarang
+                            </button>
+                            <button class="bg-blue-700 bg-opacity-50 text-white px-4 py-2 rounded-lg font-semibold hover:bg-opacity-70 transition">
+                                <i class="fas fa-gift mr-2"></i>Klaim Voucher
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-4 rounded-xl">
+                        <i class="fas fa-coins text-4xl text-yellow-300"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- E-Wallet Card -->
+            <div class="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl p-6 text-white shadow-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg">TokoKu Pay</h3>
+                    <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-xs">Aktif</span>
+                </div>
+                <p class="text-purple-100 text-sm mb-2">Saldo Anda</p>
+                <h2 class="text-3xl font-bold mb-4">Rp 150.000</h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <button class="bg-white text-purple-600 py-2 rounded-lg font-semibold text-sm hover:bg-purple-50 transition">
+                        <i class="fas fa-plus mr-1"></i> Top Up
+                    </button>
+                    <button class="bg-purple-700 bg-opacity-50 text-white py-2 rounded-lg font-semibold text-sm hover:bg-opacity-70 transition">
+                        <i class="fas fa-qrcode mr-1"></i> QRIS
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Pesanan</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="totalOrders">0</h3>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-full text-blue-600">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Pesanan Aktif</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="activeOrders">0</h3>
+                    </div>
+                    <div class="bg-yellow-100 p-3 rounded-full text-yellow-600">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Belanja</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="totalSpent">Rp 0</h3>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-full text-green-600">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Koin Saya</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1">250</h3>
+                    </div>
+                    <div class="bg-yellow-100 p-3 rounded-full text-yellow-600">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Promotional Banners -->
+        <div class="mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Promo Spesial Untukmu 🔥</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="bg-gradient-to-r from-orange-400 to-red-500 rounded-xl p-5 text-white cursor-pointer hover:scale-105 transition transform">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm opacity-90">Diskon Hingga</p>
+                            <h4 class="text-2xl font-bold mt-1">50% OFF</h4>
+                            <p class="text-sm mt-2 opacity-90">Fashion & Aksesoris</p>
+                            <button class="mt-3 bg-white text-red-500 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-50">
+                                Klaim Sekarang
+                            </button>
+                        </div>
+                        <i class="fas fa-percentage text-5xl opacity-50"></i>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-blue-400 to-cyan-500 rounded-xl p-5 text-white cursor-pointer hover:scale-105 transition transform">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm opacity-90">Cashback</p>
+                            <h4 class="text-2xl font-bold mt-1">Rp 25.000</h4>
+                            <p class="text-sm mt-2 opacity-90">Minimal belanja Rp 200rb</p>
+                            <button class="mt-3 bg-white text-blue-500 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-50">
+                                Pakai Sekarang
+                            </button>
+                        </div>
+                        <i class="fas fa-money-bill-wave text-5xl opacity-50"></i>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-green-400 to-emerald-500 rounded-xl p-5 text-white cursor-pointer hover:scale-105 transition transform">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm opacity-90">Gratis Ongkir</p>
+                            <h4 class="text-2xl font-bold mt-1">Tanpa Batas</h4>
+                            <p class="text-sm mt-2 opacity-90">Selama 7 hari</p>
+                            <button class="mt-3 bg-white text-green-500 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-50">
+                                Lihat Detail
+                            </button>
+                        </div>
+                        <i class="fas fa-shipping-fast text-5xl opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vouchers Section -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">🎟️ Voucher Saya</h3>
+                <button class="text-blue-600 text-sm font-semibold hover:underline">Lihat Semua</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="border-2 border-dashed border-blue-300 rounded-lg p-4 bg-blue-50">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-blue-800">Diskon 20%</h4>
+                            <p class="text-sm text-blue-600 mt-1">Min. belanja Rp 100rb</p>
+                            <p class="text-xs text-gray-500 mt-2">Berlaku s/d 31 Des 2024</p>
+                        </div>
+                        <button class="text-blue-600 text-xs font-semibold">Pakai</button>
+                    </div>
+                </div>
+                <div class="border-2 border-dashed border-green-300 rounded-lg p-4 bg-green-50">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-green-800">Cashback 10%</h4>
+                            <p class="text-sm text-green-600 mt-1">Max. Rp 50rb</p>
+                            <p class="text-xs text-gray-500 mt-2">Berlaku s/d 25 Des 2024</p>
+                        </div>
+                        <button class="text-green-600 text-xs font-semibold">Pakai</button>
+                    </div>
+                </div>
+                <div class="border-2 border-dashed border-purple-300 rounded-lg p-4 bg-purple-50">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-purple-800">Gratis Ongkir</h4>
+                            <p class="text-sm text-purple-600 mt-1">Tanpa minimum</p>
+                            <p class="text-xs text-gray-500 mt-2">Berlaku s/d 20 Des 2024</p>
+                        </div>
+                        <button class="text-purple-600 text-xs font-semibold">Pakai</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kategori Favorit -->
+        <div class="mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Kategori Favorit</h3>
+            <div class="grid grid-cols-3 md:grid-cols-6 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow-sm text-center cursor-pointer hover:shadow-md transition">
+                    <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-tshirt text-blue-600 text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-gray-700">Fashion</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm text-center cursor-pointer hover:shadow-md transition">
+                    <div class="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-shoe-prints text-green-600 text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-gray-700">Sepatu</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm text-center cursor-pointer hover:shadow-md transition">
+                    <div class="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-hat-cowboy text-purple-600 text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-gray-700">Aksesoris</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm text-center cursor-pointer hover:shadow-md transition">
+                    <div class="bg-yellow-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-mobile-alt text-yellow-600 text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-gray-700">Elektronik</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm text-center cursor-pointer hover:shadow-md transition">
+                    <div class="bg-red-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-home text-red-600 text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-gray-700">Rumah Tangga</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm text-center cursor-pointer hover:shadow-md transition">
+                    <div class="bg-pink-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-heart text-pink-600 text-xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-gray-700">Lainnya</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Produk Rekomendasi -->
+        <div class="mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">🔥 Produk Rekomendasi</h3>
+                <button class="text-blue-600 text-sm font-semibold hover:underline">Lihat Semua</button>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Product 1 -->
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition cursor-pointer">
+                   <img src="https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full//100/MTA-80690065/brd-12265_emoline-flanel-shirt-curt-red-kemeja-flanel-panjang-pria_full01.jpg" alt="Kemeja Flanel" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <h4 class="font-semibold text-gray-800 mb-1">Kemeja Flanel Unisex Premium</h4>
+                        <div class="flex items-center mb-2">
+                            <div class="flex text-yellow-400 text-xs">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="text-gray-500 text-xs ml-2">(124)</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-bold">Rp 150.000</span>
+                            <span class="text-gray-400 text-xs line-through">Rp 200.000</span>
+                        </div>
+                        <button class="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition">
+                            + Keranjang
+                        </button>
+                    </div>
+                </div>
+                <!-- Product 2 -->
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition cursor-pointer">
+                    <img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSC0Z1IkKloI7YShewtGvHKJm2Jo_ncWpv0ekqZot7dGSlCdA6iylK98LOMpnEcPNN9roddZC2HC_HQyuOeEdhpaZS13QtW9Yt8VN436888_swZN7O9HdTyAlvTkjSAWsMoC2i6ZGRbwtY&usqp=CAc" alt="Topi Baseball" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <h4 class="font-semibold text-gray-800 mb-1">Sepatu Converse Sneakers</h4>
+                        <div class="flex items-center mb-2">
+                            <div class="flex text-yellow-400 text-xs">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-gray-500 text-xs ml-2">(89)</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-bold">Rp 450.000</span>
+                        </div>
+                        <button class="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition">
+                            + Keranjang
+                        </button>
+                    </div>
+                </div>
+                <!-- Product 3 -->
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition cursor-pointer">
+                   <img src="https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_500,h_500/global/025166/02/fnd/IDN/fmt/png/Topi-Trucker-Scuderia-Ferrari-Race" alt="Topi F1 Ferrari" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <h4 class="font-semibold text-gray-800 mb-1">Topi F1 Ferrari</h4>
+                        <div class="flex items-center mb-2">
+                            <div class="flex text-yellow-400 text-xs">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="text-gray-500 text-xs ml-2">(67)</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-bold">Rp 75.000</span>
+                            <span class="text-gray-400 text-xs line-through">Rp 100.000</span>
+                        </div>
+                        <button class="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition">
+                            + Keranjang
+                        </button>
+                    </div>
+                </div>
+                <!-- Product 4 -->
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition cursor-pointer">
+                   <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsPJPBYCzCftvvOCRfIqapg7ClkrgKSB9BnoRkJ-ujNA&s=10" alt="Tas Ransel" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <h4 class="font-semibold text-gray-800 mb-1">Tas Ransel Hiking</h4>
+                        <div class="flex items-center mb-2">
+                            <div class="flex text-yellow-400 text-xs">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="text-gray-500 text-xs ml-2">(45)</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-bold">Rp 250.000</span>
+                        </div>
+                        <button class="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition">
+                            + Keranjang
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Riwayat Pesanan -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+            <div class="p-6 border-b flex justify-between items-center">
+                <h3 class="text-lg font-bold text-gray-800">📦 Riwayat Pesanan Saya</h3>
+                <button class="text-blue-600 text-sm font-semibold hover:underline">Lihat Semua</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+                        <tr>
+                            <th class="px-6 py-3">ID Pesanan</th>
+                            <th class="px-6 py-3">Produk</th>
+                            <th class="px-6 py-3">Total</th>
+                            <th class="px-6 py-3">Status</th>
+                            <th class="px-6 py-3">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="memberOrdersTable" class="text-gray-700 text-sm">
+                        <!-- Data akan diisi oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Proteksi halaman
+        if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+            showAlert('Akses Ditolak', 'Anda harus login terlebih dahulu!', 'warning');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        } else {
+            const currentUser = sessionStorage.getItem('currentUser');
+            const userRole = sessionStorage.getItem('currentUserRole');
+            
+            // Cek jika user adalah admin, redirect ke admin dashboard
+            if (userRole === 'admin') {
+                window.location.href = 'dashboard.html';
+            }
+            
+            document.getElementById('memberName').textContent = currentUser;
+            document.getElementById('welcomeName').textContent = currentUser;
+            
+            // Update avatar
+            const avatarImg = document.getElementById('memberAvatar');
+            avatarImg.src = `https://ui-avatars.com/api/?name=${currentUser}&background=3b82f6&color=fff`;
+        }
+
+        // Data pesanan
+        const allOrders = JSON.parse(localStorage.getItem('allOrders')) || [
+            { id: '#ORD-001', customer: sessionStorage.getItem('currentUser') || 'member', product: 'Kemeja Flanel', total: 70000, status: 'Selesai' },
+            { id: '#ORD-002', customer: sessionStorage.getItem('currentUser') || 'member', product: 'Sneakers', total: 1300000, status: 'Dikirim' }
+        ];
+
+        // Filter pesanan milik user yang login
+        const currentUser = sessionStorage.getItem('currentUser');
+        const myOrders = allOrders.filter(order => order.customer === currentUser);
+
+        // Hitung statistik
+        const totalOrders = myOrders.length;
+        const activeOrders = myOrders.filter(o => o.status === 'Diproses' || o.status === 'Dikirim').length;
+        const totalSpent = myOrders.reduce((sum, order) => sum + order.total, 0);
+
+        // Update tampilan
+        document.getElementById('totalOrders').textContent = totalOrders;
+        document.getElementById('activeOrders').textContent = activeOrders;
+        document.getElementById('totalSpent').textContent = 'Rp ' + totalSpent.toLocaleString('id-ID');
+
+        // Render tabel pesanan
+        const tbody = document.getElementById('memberOrdersTable');
+        if (myOrders.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                        <i class="fas fa-shopping-bag text-5xl text-gray-300 mb-3"></i>
+                        <p class="mb-2">Belum ada pesanan</p>
+                        <button class="text-blue-600 font-semibold hover:underline">Mulai Belanja Sekarang →</button>
+                    </td>
+                </tr>
+            `;
+        } else {
+            myOrders.forEach(order => {
+                const statusColor = {
+                    'Selesai': 'bg-green-100 text-green-800',
+                    'Dikirim': 'bg-yellow-100 text-yellow-800',
+                    'Diproses': 'bg-blue-100 text-blue-800',
+                    'Dibatalkan': 'bg-red-100 text-red-800'
+                };
+                
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium">${order.id}</td>
+                        <td class="px-6 py-4">${order.product}</td>
+                        <td class="px-6 py-4">Rp ${order.total.toLocaleString('id-ID')}</td>
+                        <td class="px-6 py-4">
+                            <span class="${statusColor[order.status]} px-3 py-1 rounded-full text-xs font-semibold">
+                                ${order.status}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <button class="text-blue-600 hover:text-blue-800 text-sm font-semibold mr-3">Detail</button>
+                            ${order.status === 'Selesai' ? '<button class="text-green-600 hover:text-green-800 text-sm font-semibold">Beli Lagi</button>' : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Profile dropdown
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        profileBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            profileDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!profileDropdown.contains(event.target) && !profileBtn.contains(event.target)) {
+                profileDropdown.classList.add('hidden');
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        });
+
+        // Custom Alert Function
+        function showAlert(title, message, type = 'info') {
+            alert(title + ': ' + message); // Fallback sederhana
+        }
+    </script>
+</body>
+</html>
