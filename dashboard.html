@@ -61,7 +61,7 @@
                 <div class="flex items-center space-x-4">
                     <button class="text-gray-500 hover:text-blue-600 transition relative">
                         <i class="fas fa-bell text-xl"></i>
-                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+                        <span id="notifBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
                     </button>
                     
                     <!-- PROFILE DROPDOWN -->
@@ -428,6 +428,25 @@
                 }
             }
         });
+
+        // ==================== NOTIFIKASI BADGE ====================
+    function updateNotifBadge() {
+        const users = JSON.parse(localStorage.getItem('validUsers')) || [];
+        const pendingAdmins = users.filter(u => u.role === 'admin' && !u.isVerified).length;
+        
+        const notifBadge = document.getElementById('notifBadge');
+        if (notifBadge) {
+            if (pendingAdmins > 0) {
+                notifBadge.textContent = pendingAdmins;
+                notifBadge.classList.remove('hidden'); // Tampilkan badge
+            } else {
+                notifBadge.classList.add('hidden'); // Sembunyikan badge
+            }
+        }
+    }
+
+    // Panggil fungsi saat halaman load
+    updateNotifBadge();
     </script>
 </body>
 </html>
